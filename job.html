@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job Details | Devan Placements</title>
+  <meta name="description" content="Overseas job details, eligibility and how to apply with Devan Placements." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#07152b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <a href="jobs.html">Active Jobs</a> / <span id="crumb">Job</span></nav>
+      <h1 id="job-title">Loading…</h1>
+      <div class="badges" id="job-badges"></div>
+    </div>
+  </section>
+
+  <section class="section bg-white">
+    <div class="container">
+      <p class="sample-banner" id="sample-banner" hidden>Showing a sample vacancy while the live list is unavailable.</p>
+      <div id="notfound" class="notfound" hidden>
+        <h2>This vacancy is no longer available</h2>
+        <p>It may have been filled or closed. Browse our other active jobs or register your profile.</p>
+        <div class="btn-row center"><a class="btn btn-navy btn-lg" href="jobs.html">View active jobs</a><a class="btn btn-outline btn-lg" href="index.html#register">Register your profile</a></div>
+      </div>
+
+      <div class="detail-grid" id="detail" hidden>
+        <div class="detail-main">
+          <section aria-labelledby="h-overview">
+            <h2 id="h-overview">Job overview</h2>
+            <p id="job-desc"></p>
+          </section>
+          <section aria-labelledby="h-facts">
+            <h2 id="h-facts">Key details</h2>
+            <dl class="facts" id="facts"></dl>
+          </section>
+          <section aria-labelledby="h-role" id="sec-role"><h2 id="h-role">Job role</h2><p id="job-role"></p></section>
+          <section aria-labelledby="h-scope" id="sec-scope"><h2 id="h-scope">Job scope</h2><p id="job-scope"></p></section>
+          <section aria-labelledby="h-elig" id="sec-elig"><h2 id="h-elig">Eligibility</h2><p id="job-elig"></p></section>
+          <section aria-labelledby="h-contact" id="sec-contact"><h2 id="h-contact">Contact</h2><p id="job-contact"></p></section>
+          <div class="note-bar">* Notice: Selection is made by the employer. Registration is free and does not guarantee employment.</div>
+        </div>
+
+        <aside class="detail-side" aria-label="Apply or enquire">
+          <div class="form-card apply-top">
+            <a class="btn btn-gold btn-block" href="#apply">Apply now</a>
+            <a class="btn btn-whatsapp btn-block" id="wa-enquiry" href="#" target="_blank" rel="noopener">💬 WhatsApp enquiry</a>
+            <a class="btn btn-outline btn-block" href="#enquiry">Vacancy enquiry form</a>
+          </div>
+
+          <form class="form-card" id="apply-form" novalidate>
+            <h2 id="apply">Apply for this job</h2>
+            <p class="sub">Free to apply. Upload your latest resume.</p>
+            <div class="form-grid">
+              <label>Full name *<input type="text" name="fullName" autocomplete="name" required /></label>
+              <label>Mobile / WhatsApp *<input type="tel" inputmode="tel" autocomplete="tel" name="phone" placeholder="+91 98765 43210" required /></label>
+              <label>Email *<input type="email" autocomplete="email" name="email" required /></label>
+              <label>Current location *<input type="text" name="location" autocomplete="address-level2" required /></label>
+              <label>Years of experience<input type="text" name="experience" placeholder="e.g. 3 years" /></label>
+            </div>
+            <div class="field-label" id="resume-label">Resume / CV *</div>
+            <label class="dropzone" for="resume">
+              <span class="dz-icon" aria-hidden="true">⬆️</span>
+              <strong class="dz-text">Drag &amp; drop your resume here or <u>browse files</u></strong>
+              <small>PDF, DOC or DOCX, max 5MB</small>
+              <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" class="sr-only" />
+            </label>
+            <label class="consent"><input type="checkbox" name="consent" required />
+              <span>I consent to the processing of my personal information for recruitment purposes in accordance with the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
+            <p class="form-status" role="status" aria-live="polite"></p>
+            <button type="submit" class="btn btn-gold btn-block">Submit application →</button>
+          </form>
+
+          <form class="form-card" id="enquiry-form" novalidate>
+            <h2 id="enquiry">Vacancy enquiry</h2>
+            <p class="sub">Questions about salary, visa or documents? Ask us.</p>
+            <div class="form-grid">
+              <label>Name *<input type="text" name="name" autocomplete="name" required /></label>
+              <label>Mobile / WhatsApp *<input type="tel" inputmode="tel" autocomplete="tel" name="phone" required /></label>
+              <label>Email<input type="email" autocomplete="email" name="email" /></label>
+              <label>Your question *<textarea name="message" rows="3" required></textarea></label>
+            </div>
+            <p class="form-status" role="status" aria-live="polite"></p>
+            <button type="submit" class="btn btn-navy btn-block">Send enquiry →</button>
+          </form>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="site.js"></script>
+<script src="job.js"></script>
+</body>
+</html>

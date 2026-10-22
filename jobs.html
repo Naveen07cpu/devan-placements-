@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Active Overseas & local indian Jobs | Devan Placements</title>
+  <meta name="description" content="Browse active overseas job vacancies. Search by job title, country, category and experience, then apply online or enquire on WhatsApp." />
+  <link rel="canonical" href="https://www.devanplacements.com/jobs.html" />
+  <meta property="og:title" content="Active Overseas Jobs | Devan Placements" />
+  <meta property="og:description" content="Search live vacancies in Singapore, Malaysia, the Gulf and more." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#07152b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / Active Jobs</nav>
+      <h1>local &amp; Overseas Jobs</h1>
+      <p>explore job opportunities Across india and abroad. search, filter and apply online.</p>
+    </div>
+  </section>
+
+  <section class="section bg-white">
+    <div class="container">
+      <form class="filter-bar jobs-page" id="job-filter" role="search" aria-label="Filter jobs" autocomplete="off">
+        <label>Search job title or keyword
+          <input type="search" id="f-q" placeholder="e.g. Electrician, Driver, Welder..." />
+        </label>
+        <label>Country
+          <select id="f-country"><option value="">All countries</option></select>
+        </label>
+        <label>Job Location
+  <select name="jobLocation" id="filter-job-location">
+    <option value="all">All Jobs</option>
+    <option value="local">Local Jobs (India)</option>
+    <option value="overseas">Overseas Jobs</option>
+  </select>
+</label>
+        <label>Category
+          <select id="f-category"><option value="">All categories</option></select>
+        </label>
+        <label>Experience
+          <select id="f-exp">
+            <option value="">Any experience</option>
+            <option value="0-2">0 - 2 years</option>
+            <option value="3-5">3 - 5 years</option>
+            <option value="5+">5+ years</option>
+          </select>
+        </label>
+      </form>
+
+      <div class="results-bar">
+        <p id="result-count" role="status" aria-live="polite">Loading vacancies…</p>
+        <button type="button" class="link-btn" id="clear-filters" hidden>Clear filters</button>
+      </div>
+      <p class="sample-banner" id="sample-banner" hidden>Showing sample vacancies while the live list is unavailable.</p>
+
+      <div class="grid grid-2" id="job-grid"></div>
+      <p class="empty-state" id="job-empty" hidden>No vacancies match your filters. Try a different title or country, or <a class="text-link" href="index.html#register">register your profile</a> and we will contact you when a suitable job opens.</p>
+      <div class="load-more"><button type="button" class="btn btn-navy" id="load-more" hidden>Load more jobs</button></div>
+
+      <div class="note-bar">* Notice: Job availability depends on verified employer requirements and applicable immigration regulations. Registration is free of charge.</div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="site.js"></script>
+<script src="jobs.js"></script>
+</body>
+</html>
