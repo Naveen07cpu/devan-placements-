@@ -1,22 +1,20 @@
 /**
- * Devan Placements – Google Apps Script backend (v2)
+ * Devan Placements — Google Apps Script backend (v3)
+ * Bound to the Devan Placements Google spreadsheet.
  *
- * WHAT THIS DOES
- *  1. Saves form submissions into Google Sheets (+ resumes into Google Drive)
- *       candidate  -> "Candidates"
- *       employer   -> "Employers"
- *       contact    -> "Contacts"
- *       application-> "Applications"        (Apply Now on a job page)
- *       enquiry    -> "Vacancy Enquiries"   (vacancy enquiry on a job page)
- *  2. Serves the job vacancies to the website from the "Jobs" sheet
- *       GET ?action=jobs  -> all rows where Status = Active
+ * SETUP:
+ * 1. Paste into Code.gs in the spreadsheet's Extensions > Apps Script.
+ * 2. Save, select setup, and Run once (approve permissions).
+ * 3. Deploy > Manage deployments > Edit > New version > Deploy.
+ *    Execute as: Me; Access: Anyone (for a public site).
+ * 4. Keep the /exec URL in site.js SCRIPT_URL.
  *
- * HOW TO POST A NEW VACANCY: open the "Jobs" sheet and fill a new row.
- * Job Code, Posted Date and Status fill themselves when you type the Job Title.
+ * Website: GET ?action=jobs -> {result:"success", jobs:[...]}
+ * Forms: POST JSON with formType candidate/application/enquiry/employer/contact.
+ * India = local; other countries = overseas (filtered by jobs.js).
  *
- * SETUP: run setup() once, then Deploy -> New deployment -> Web app
- *        (Execute as: Me, Who has access: Anyone). After any later edit use
- *        Deploy -> Manage deployments -> Edit -> New version.
+ * WARNING: A public POST endpoint can be abused. Add spam/rate limiting
+ * before production, and never put confidential credentials in this script.
  */
 
 const NOTIFY_EMAIL = "devanplacements@gmail.com";
@@ -24,252 +22,294 @@ const RESUME_FOLDER_NAME = "Devan Placements - Resumes";
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 const ALLOWED_EXT = ["pdf", "doc", "docx"];
 const JOBS_CACHE_SECONDS = 60;
+const JOB_CACHE_KEY = "jobs_json_v3";
 
-/* ---------------- Jobs sheet layout ---------------- */
 const JOB_HEADERS = [
   "Job Code", "Status", "Posted Date", "Employer Name", "Show Employer (Yes/No)",
   "Country", "Job Title", "Category", "Vacancies", "Salary", "Working Hours",
   "Accommodation", "Food", "Contract Terms", "Eligibility", "Education",
   "Age Limit", "Experience", "Job Role", "Nature of Job", "Job Scope",
-  "Contact Person", "Contact Phone", "Short Description",
+  "Contact Person", "Contact Phone", "Short Description"
 ];
-// JSON key for each column above (same order)
 const JOB_KEYS = [
   "code", "status", "postedDate", "employer", "showEmployer",
   "country", "title", "category", "vacancies", "salary", "hours",
   "accommodation", "food", "contract", "eligibility", "education",
   "ageLimit", "experience", "role", "nature", "scope",
-  "contactPerson", "contactPhone", "description",
-];
-const JOB_SAMPLES = [
-  ["", "Active", "", "Leading MEP Contractor", "No", "Singapore", "Senior Electrical Maintenance Technician", "Skilled Manpower", 5,
-   "Competitive / As per visa", "8 hours/day, 6 days/week", "Provided", "Provided / allowance", "2 years, renewable",
-   "Licensed technician, trade test required", "ITI / Diploma in Electrical", "25 - 45", "3 - 5 Years",
-   "Maintain commercial building electrical and low-voltage systems", "Full time, on-site",
-   "Fault finding, preventive maintenance, installation, reporting", "Recruitment Desk", "+91 86810 22518",
-   "Licensed technicians for commercial building MEP systems and low-voltage controls."],
-  ["", "Active", "", "Logistics Group", "No", "United Arab Emirates", "Heavy Vehicle Trailer Driver", "Drivers & Logistics", 10,
-   "Standard scale + allowances", "10 hours/day, 6 days/week", "Provided", "Allowance", "2 years",
-   "Valid heavy license, GCC license preferred", "10th pass", "25 - 50", "2+ Years",
-   "Drive tractor-trailer on regional freight routes", "Full time, long distance",
-   "Loading checks, safe driving, trip log maintenance", "Recruitment Desk", "+91 86810 22518",
-   "Experienced tractor-trailer drivers for regional freight distribution."],
+  "contactPerson", "contactPhone", "description"
 ];
 
-/* ---------------- Form layout ---------------- */
 const SHEETS = {
   candidate: {
     name: "Candidates",
     headers: ["Timestamp", "Full Name", "Phone", "Email", "Location", "Preferred Country",
-              "Job Category", "Qualification", "Experience", "Job Role", "Resume Link", "Consent", "Page URL"],
-    row: (d, resumeUrl) => [new Date(), d.fullName, d.phone, d.email, d.location, d.country,
-                            d.category, d.qualification, d.experience, d.jobRole, resumeUrl,
-                            d.consent ? "Yes" : "No", d.pageUrl],
-    subject: (d) => "New candidate: " + d.fullName + " (" + d.country + ")",
+      "Job Category", "Qualification", "Experience", "Job Role", "Resume Link", "Consent", "Page URL"],
+    row: (d, url) => [new Date(), d.fullName, d.phone, d.email, d.location, d.country,
+      d.category, d.qualification, d.experience, d.jobRole, url, d.consent ? "Yes" : "No", d.pageUrl],
+    subject: d => "New candidate: " + d.fullName + " (" + d.country + ")",
     required: ["fullName", "phone", "email", "location", "country", "category", "qualification", "experience"],
-    needsResume: true,
+    needsResume: true
   },
   application: {
     name: "Applications",
     headers: ["Timestamp", "Job Code", "Job Title", "Country", "Full Name", "Phone", "Email",
-              "Location", "Experience", "Resume Link", "Consent", "Page URL"],
-    row: (d, resumeUrl) => [new Date(), d.jobCode, d.jobTitle, d.jobCountry, d.fullName, d.phone, d.email,
-                            d.location, d.experience, resumeUrl, d.consent ? "Yes" : "No", d.pageUrl],
-    subject: (d) => "New application: " + d.jobTitle + " (" + d.jobCode + ") - " + d.fullName,
+      "Location", "Experience", "Resume Link", "Consent", "Page URL"],
+    row: (d, url) => [new Date(), d.jobCode, d.jobTitle, d.jobCountry, d.fullName, d.phone,
+      d.email, d.location, d.experience, url, d.consent ? "Yes" : "No", d.pageUrl],
+    subject: d => "New application: " + d.jobTitle + " (" + d.jobCode + ") - " + d.fullName,
     required: ["jobCode", "jobTitle", "fullName", "phone", "email", "location"],
-    needsResume: true,
+    needsResume: true
   },
   enquiry: {
     name: "Vacancy Enquiries",
     headers: ["Timestamp", "Job Code", "Job Title", "Name", "Phone", "Email", "Message", "Page URL"],
-    row: (d) => [new Date(), d.jobCode, d.jobTitle, d.name, d.phone, d.email, d.message, d.pageUrl],
-    subject: (d) => "Vacancy enquiry: " + d.jobTitle + " (" + d.jobCode + ") - " + d.name,
-    required: ["jobCode", "jobTitle", "name", "phone", "message"],
+    row: d => [new Date(), d.jobCode, d.jobTitle, d.name, d.phone, d.email, d.message, d.pageUrl],
+    subject: d => "Vacancy enquiry: " + d.jobTitle + " (" + d.jobCode + ") - " + d.name,
+    required: ["jobCode", "jobTitle", "name", "phone", "message"]
   },
   employer: {
     name: "Employers",
     headers: ["Timestamp", "Company", "Contact Person", "Country", "Email", "Phone",
-              "Required Positions", "Number of Workers", "Requirements", "Page URL"],
-    row: (d) => [new Date(), d.company, d.contactPerson, d.country, d.email, d.phone,
-                 d.positions, d.workers, d.requirements, d.pageUrl],
-    subject: (d) => "New employer enquiry: " + d.company + " (" + d.country + ")",
-    required: ["company", "contactPerson", "country", "email", "phone", "positions", "workers"],
+      "Required Positions", "Number of Workers", "Requirements", "Page URL"],
+    row: d => [new Date(), d.company, d.contactPerson, d.country, d.email, d.phone,
+      d.positions, d.workers, d.requirements, d.pageUrl],
+    subject: d => "New employer enquiry: " + d.company + " (" + d.country + ")",
+    required: ["company", "contactPerson", "country", "email", "phone", "positions", "workers"]
   },
   contact: {
     name: "Contacts",
     headers: ["Timestamp", "Name", "Email", "Phone", "Enquiry Type", "Message", "Page URL"],
-    row: (d) => [new Date(), d.name, d.email, d.phone, d.enquiryType, d.message, d.pageUrl],
-    subject: (d) => "New message (" + d.enquiryType + ") from " + d.name,
-    required: ["name", "email", "phone", "enquiryType", "message"],
-  },
+    row: d => [new Date(), d.name, d.email, d.phone, d.enquiryType, d.message, d.pageUrl],
+    subject: d => "New message (" + d.enquiryType + ") from " + d.name,
+    required: ["name", "email", "phone", "enquiryType", "message"]
+  }
 };
 
-/* ---------------- One-time setup ---------------- */
+/** Run once. Does not overwrite or insert sample jobs into existing data. */
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  Object.keys(SHEETS).forEach(function (k) { getSheet_(ss, SHEETS[k]); });
+  if (!ss) throw new Error("Open Apps Script from Extensions > Apps Script inside your spreadsheet.");
+  Object.keys(SHEETS).forEach(k => getSheet_(ss, SHEETS[k]));
   const jobs = getJobsSheet_(ss);
-  if (jobs.getLastRow() < 2) {
-    JOB_SAMPLES.forEach(function (row) { jobs.appendRow(row); fillJobDefaults_(jobs, jobs.getLastRow()); });
+  ensureJobValidations_(jobs);
+  // Backfill missing defaults on existing rows without modifying filled cells.
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    for (let r = 2; r <= jobs.getLastRow(); r++) fillJobDefaults_(jobs, r);
+    CacheService.getScriptCache().remove(JOB_CACHE_KEY);
+  } finally {
+    lock.releaseLock();
   }
   getResumeFolder_();
-  const first = ss.getSheetByName("Sheet1");
-  if (first && first.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(first);
 }
 
-/* ---------------- Auto-fill Job Code / Date / Status ---------------- */
-// Simple trigger: runs by itself whenever you edit the sheet.
+/** Handles single-cell edits AND multiple pasted rows. */
 function onEdit(e) {
+  if (!e || !e.range) return;
+  const sh = e.range.getSheet();
+  if (sh.getName() !== "Jobs" || e.range.getLastRow() < 2) return;
+  const lock = LockService.getDocumentLock() || LockService.getScriptLock();
+  if (!lock.tryLock(15000)) return;
   try {
-    const sh = e.range.getSheet();
-    if (sh.getName() !== "Jobs" || e.range.getRow() < 2) return;
-    fillJobDefaults_(sh, e.range.getRow());
-    CacheService.getScriptCache().remove("jobs_json");
-  } catch (err) { /* never block the editor */ }
+    const start = Math.max(2, e.range.getRow());
+    for (let row = start; row <= e.range.getLastRow(); row++) {
+      fillJobDefaults_(sh, row);
+    }
+    CacheService.getScriptCache().remove(JOB_CACHE_KEY);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
+/**
+ * Generate unique job codes. Existing codes are never changed.
+ * Code numbers may have gaps, which is safe.
+ */
 function fillJobDefaults_(sh, row) {
-  const title = sh.getRange(row, 7).getValue();
+  const title = String(sh.getRange(row, 7).getDisplayValue() || "").trim();
   if (!title) return;
-  if (!sh.getRange(row, 1).getValue()) {
-    const n = ("000" + (row - 1)).slice(-3);
-    sh.getRange(row, 1).setValue("JOB-" + n);
+  const codeCell = sh.getRange(row, 1);
+  if (!String(codeCell.getDisplayValue() || "").trim()) {
+    const last = sh.getLastRow();
+    const existing = last > 1
+      ? sh.getRange(2, 1, last - 1, 1).getDisplayValues().flat()
+      : [];
+    let max = 0;
+    existing.forEach(value => {
+      const m = /^JOB-(\d+)$/i.exec(String(value).trim());
+      if (m) max = Math.max(max, Number(m[1]));
+    });
+    codeCell.setValue("JOB-" + String(max + 1).padStart(3, "0"));
   }
   if (!sh.getRange(row, 2).getValue()) sh.getRange(row, 2).setValue("Active");
   if (!sh.getRange(row, 3).getValue()) sh.getRange(row, 3).setValue(new Date());
   if (!sh.getRange(row, 5).getValue()) sh.getRange(row, 5).setValue("No");
 }
 
-/* ---------------- Web app entry points ---------------- */
 function doGet(e) {
-  const action = e && e.parameter && e.parameter.action;
-  if (action === "jobs") return json_({ result: "success", jobs: getJobs_() });
-  return ContentService.createTextOutput("Devan Placements web app is running.");
+  try {
+    const action = e && e.parameter && e.parameter.action;
+    if (action === "jobs") return json_({ result: "success", jobs: getJobs_() });
+    return ContentService.createTextOutput("Devan Placements web app is running.");
+  } catch (err) {
+    return json_({ result: "error", message: String(err.message || err) });
+  }
 }
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
+  let locked = false;
   try {
     lock.waitLock(20000);
-    const data = JSON.parse(e.postData.contents);
-    const cfg = SHEETS[data.formType];
-    if (!cfg) return json_({ result: "error", message: "Unknown form type" });
+    locked = true;
+    if (!e || !e.postData || !e.postData.contents) throw new Error("Empty request");
+    const d = JSON.parse(e.postData.contents);
+    const cfg = SHEETS[d.formType];
+    if (!cfg) throw new Error("Unknown form type");
+    const problem = validate_(cfg, d);
+    if (problem) throw new Error(problem);
 
-    const problem = validate_(cfg, data);
-    if (problem) return json_({ result: "error", message: problem });
-
-    let resumeUrl = "";
-    if (cfg.needsResume) resumeUrl = saveResume_(data);
-
-    getSheet_(SpreadsheetApp.getActiveSpreadsheet(), cfg).appendRow(cfg.row(data, resumeUrl));
-    notify_(cfg, data, resumeUrl);
+    const resumeUrl = cfg.needsResume ? saveResume_(d) : "";
+    getSheet_(SpreadsheetApp.getActiveSpreadsheet(), cfg).appendRow(cfg.row(d, resumeUrl));
+    // A notification failure must not turn a successfully saved submission into an error.
+    try {
+      notify_(cfg, d, resumeUrl);
+    } catch (mailErr) {
+      console.error("Notification email failed: " + mailErr);
+    }
     return json_({ result: "success" });
   } catch (err) {
+    console.error(err);
     return json_({ result: "error", message: String(err.message || err) });
   } finally {
-    lock.releaseLock();
+    if (locked) lock.releaseLock();
   }
 }
 
-/* ---------------- Jobs ---------------- */
 function getJobsSheet_(ss) {
   let sh = ss.getSheetByName("Jobs");
   if (!sh) {
     sh = ss.insertSheet("Jobs", 0);
-    sh.appendRow(JOB_HEADERS);
-    sh.getRange(1, 1, 1, JOB_HEADERS.length).setFontWeight("bold").setBackground("#0b1f3a").setFontColor("#ffffff");
+    sh.getRange(1, 1, 1, JOB_HEADERS.length).setValues([JOB_HEADERS]);
+    sh.getRange(1, 1, 1, JOB_HEADERS.length)
+      .setFontWeight("bold").setBackground("#0b1f3a").setFontColor("#ffffff");
     sh.setFrozenRows(1);
-    sh.getRange(2, 2, 500, 1).setDataValidation(
-      SpreadsheetApp.newDataValidation().requireValueInList(["Active", "Closed"], true).build());
-    sh.getRange(2, 5, 500, 1).setDataValidation(
-      SpreadsheetApp.newDataValidation().requireValueInList(["Yes", "No"], true).build());
   }
   return sh;
 }
 
+function ensureJobValidations_(sh) {
+  const rows = Math.max(1, sh.getMaxRows() - 1);
+  const ruleStatus = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["Active", "Closed"], true).build();
+  const ruleEmployer = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["Yes", "No"], true).build();
+  sh.getRange(2, 2, rows, 1).setDataValidation(ruleStatus);
+  sh.getRange(2, 5, rows, 1).setDataValidation(ruleEmployer);
+}
+
 function getJobs_() {
   const cache = CacheService.getScriptCache();
-  const hit = cache.get("jobs_json");
-  if (hit) return JSON.parse(hit);
+  const cached = cache.get(JOB_CACHE_KEY);
+  if (cached) return JSON.parse(cached);
 
   const sh = getJobsSheet_(SpreadsheetApp.getActiveSpreadsheet());
-  const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, JOB_HEADERS.length).getValues() : [];
+  const last = sh.getLastRow();
+  const rows = last > 1
+    ? sh.getRange(2, 1, last - 1, JOB_HEADERS.length).getValues()
+    : [];
   const tz = Session.getScriptTimeZone();
   const jobs = rows
-    .filter(function (r) { return r[6] && String(r[1]).toLowerCase() === "active"; })
-    .map(function (r) {
+    .filter(r => String(r[6] || "").trim() &&
+      String(r[1] || "").trim().toLowerCase() === "active")
+    .map(r => {
       const j = {};
-      JOB_KEYS.forEach(function (k, i) {
+      JOB_KEYS.forEach((key, i) => {
         const v = r[i];
-        j[k] = v instanceof Date ? Utilities.formatDate(v, tz, "yyyy-MM-dd") : String(v === null ? "" : v).trim();
+        j[key] = v instanceof Date
+          ? Utilities.formatDate(v, tz, "yyyy-MM-dd")
+          : String(v == null ? "" : v).trim();
       });
-      // keep employer private unless the row says Yes (never leaves the server otherwise)
-      if (String(j.showEmployer).toLowerCase() !== "yes") j.employer = "";
+      if (j.showEmployer.toLowerCase() !== "yes") j.employer = "";
       delete j.showEmployer;
       const m = String(j.experience).match(/\d+/);
       j.expMin = m ? Number(m[0]) : 0;
       return j;
     })
-    .sort(function (a, b) {   // newest first; same day -> higher job code first
-      return String(b.postedDate).localeCompare(String(a.postedDate)) || String(b.code).localeCompare(String(a.code));
-    });
+    .sort((a, b) =>
+      b.postedDate.localeCompare(a.postedDate) ||
+      b.code.localeCompare(a.code, undefined, { numeric: true }));
 
-  cache.put("jobs_json", JSON.stringify(jobs), JOBS_CACHE_SECONDS);
+  // CacheService entries have a size limit; skip caching if too large.
+  const serialized = JSON.stringify(jobs);
+  if (serialized.length < 90000) {
+    try { cache.put(JOB_CACHE_KEY, serialized, JOBS_CACHE_SECONDS); }
+    catch (err) { console.warn("Job cache skipped: " + err); }
+  }
   return jobs;
 }
 
-/* ---------------- Helpers ---------------- */
 function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function getSheet_(ss, cfg) {
-  let sheet = ss.getSheetByName(cfg.name);
-  if (!sheet) {
-    sheet = ss.insertSheet(cfg.name);
-    sheet.appendRow(cfg.headers);
-    sheet.getRange(1, 1, 1, cfg.headers.length).setFontWeight("bold").setBackground("#0b1f3a").setFontColor("#ffffff");
-    sheet.setFrozenRows(1);
+  let sh = ss.getSheetByName(cfg.name);
+  if (!sh) {
+    sh = ss.insertSheet(cfg.name);
+    sh.appendRow(cfg.headers);
+    sh.getRange(1, 1, 1, cfg.headers.length)
+      .setFontWeight("bold").setBackground("#0b1f3a").setFontColor("#ffffff");
+    sh.setFrozenRows(1);
   }
-  return sheet;
+  return sh;
 }
 
 function getResumeFolder_() {
-  const it = DriveApp.getFoldersByName(RESUME_FOLDER_NAME);
-  return it.hasNext() ? it.next() : DriveApp.createFolder(RESUME_FOLDER_NAME);
+  const folders = DriveApp.getFoldersByName(RESUME_FOLDER_NAME);
+  return folders.hasNext()
+    ? folders.next()
+    : DriveApp.createFolder(RESUME_FOLDER_NAME);
 }
 
 function validate_(cfg, d) {
-  for (let i = 0; i < cfg.required.length; i++) {
-    const v = d[cfg.required[i]];
-    if (!v || !String(v).trim()) return "Missing field: " + cfg.required[i];
+  for (const field of cfg.required) {
+    if (!d[field] || !String(d[field]).trim()) return "Missing field: " + field;
   }
   if (d.email && !/^\S+@\S+\.\S+$/.test(d.email)) return "Invalid email address";
   if (cfg.needsResume && !d.resumeBase64) return "Resume is required";
+  // Base64 expands file size by about one third.
+  if (d.resumeBase64 && d.resumeBase64.length > Math.ceil(MAX_RESUME_BYTES * 4 / 3) + 8)
+    return "Resume is larger than 5MB";
   return "";
 }
 
 function saveResume_(d) {
   const ext = String(d.resumeName || "").split(".").pop().toLowerCase();
-  if (ALLOWED_EXT.indexOf(ext) === -1) throw new Error("Only PDF, DOC or DOCX resumes are allowed.");
-
+  if (!ALLOWED_EXT.includes(ext)) throw new Error("Only PDF, DOC or DOCX resumes are allowed.");
   const bytes = Utilities.base64Decode(d.resumeBase64);
   if (bytes.length > MAX_RESUME_BYTES) throw new Error("Resume is larger than 5MB.");
-
-  const who = d.fullName || d.name || "candidate";
-  const safeName = String(who).replace(/[^\w\- ]/g, "").trim().replace(/\s+/g, "_");
+  const safeName = String(d.fullName || d.name || "candidate")
+    .replace(/[^\w\- ]/g, "").trim().replace(/\s+/g, "_") || "candidate";
   const stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyyMMdd-HHmmss");
-  const blob = Utilities.newBlob(bytes, d.resumeMime || "application/octet-stream", safeName + "_" + stamp + "." + ext);
+  const blob = Utilities.newBlob(bytes, d.resumeMime || "application/octet-stream",
+    safeName + "_" + stamp + "." + ext);
   return getResumeFolder_().createFile(blob).getUrl();
 }
 
 function notify_(cfg, d, resumeUrl) {
   const skip = ["resumeBase64", "resumeMime", "pageUrl", "formType"];
   const lines = Object.keys(d)
-    .filter(function (k) { return skip.indexOf(k) === -1; })
-    .map(function (k) { return k + ": " + d[k]; });
+    .filter(key => !skip.includes(key))
+    .map(key => key + ": " + d[key]);
   if (resumeUrl) lines.push("Resume: " + resumeUrl);
-  const mail = { to: NOTIFY_EMAIL, subject: cfg.subject(d), body: lines.join("\n") };
+  const mail = {
+    to: NOTIFY_EMAIL,
+    subject: cfg.subject(d),
+    body: lines.join("\n")
+  };
   if (d.email && /^\S+@\S+\.\S+$/.test(d.email)) mail.replyTo = d.email;
-  MailApp.sendEmail(mail);   // note: free Gmail accounts can send ~100 emails/day
+  MailApp.sendEmail(mail);
 }
