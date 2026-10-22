@@ -17,10 +17,10 @@ const SITE = {
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.com",// change when the real domain is live
   social: {
-    Instagram: "https://instagram.com/devanplacements",
+    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
     WhatsApp: "",                           // filled automatically from whatsappNumber
-    Telegram: "",
+    Telegram: "https://t.me/Devanplacements",
     LinkedIn: "",
     YouTube: "",
   },
