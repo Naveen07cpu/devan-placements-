@@ -391,3 +391,64 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 .country a, .cat a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 0; }
 .brand { gap: .28em; }   /* keeps the space between "Devan" and "Placements" in the flex layout */
 .site-footer .brand { color: #fff; }
+
+/* =====================================================================
+   Admin dashboard
+   ===================================================================== */
+.admin-body { background: var(--slate-50); min-height: 100vh; }
+.admin-tag { font: 600 11px var(--font-body); letter-spacing: .6px; text-transform: uppercase; color: var(--navy-900); background: var(--gold); padding: 2px 8px; border-radius: 999px; margin-left: 6px; }
+.admin-nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.admin-nav button, .admin-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--slate-300); font: 500 14px var(--font-body); cursor: pointer; }
+.admin-nav button:hover, .admin-nav a:hover { color: #fff; background: rgba(255,255,255,.08); }
+.admin-nav [aria-current="page"] { color: var(--navy-900); background: var(--gold); font-weight: 600; }
+.admin-nav .btn-logout { border: 1px solid rgba(255,255,255,.3); }
+.login-card { max-width: 420px; margin: 40px auto; }
+.login-card h1 { font-size: 26px; margin-bottom: 4px; }
+.login-card label { margin: 16px 0 8px; }
+.admin-panel { border-bottom: 0; padding: 32px 0 64px; }
+.admin-h { font-size: 28px; line-height: 34px; margin-bottom: 20px; }
+.admin-h2 { font-size: 20px; margin: 32px 0 12px; }
+.admin-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.admin-head .admin-h { margin-bottom: 12px; }
+.admin-head .btn { padding: 12px 22px; font-size: 15px; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+.stat { background: #fff; border: 1px solid var(--slate-200); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+.stat b { display: block; font: 700 34px/40px var(--font-head); color: var(--navy-800); }
+.stat span { font-size: 13px; color: var(--slate-600); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin: 8px 0 16px; }
+.toolbar label { min-width: 200px; font-size: 12px; font-weight: 600; color: var(--slate-600); }
+.toolbar p { margin: 0 0 12px; font-size: 14px; color: var(--slate-600); }
+.table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--slate-200); border-radius: 14px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data-table th { text-align: left; padding: 12px 14px; background: var(--slate-100); color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; position: sticky; top: 0; }
+.data-table td { padding: 12px 14px; border-top: 1px solid var(--slate-200); color: var(--slate-800); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.data-table td.wide { max-width: 320px; }
+.data-table tbody tr:hover { background: var(--slate-50); }
+.data-table a { color: var(--navy-600); text-decoration: underline; }
+.data-table td.actions { white-space: nowrap; max-width: none; }
+.data-table .actions button, .data-table .actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 56px; padding: 0 10px; margin-right: 4px; border: 1px solid var(--slate-300); border-radius: 8px; background: #fff; color: var(--navy-800); font: 600 13px var(--font-body); cursor: pointer; text-decoration: none; }
+.data-table .actions button:hover, .data-table .actions a:hover { border-color: var(--navy-600); }
+.data-table .actions .danger { color: #b91c1c; border-color: #fecaca; }
+.data-table .actions .danger:hover { background: #fef2f2; border-color: #b91c1c; }
+.status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.status.on { background: var(--green-bg); color: var(--green-text); }
+.status.off { background: #fee2e2; color: #991b1b; }
+#job-dialog { width: min(760px, 94vw); max-height: 92vh; padding: 0; border: 0; border-radius: 20px; box-shadow: 0 30px 80px rgba(7,21,43,.45); }
+#job-dialog::backdrop { background: rgba(7,21,43,.6); }
+#job-dialog form { padding: 24px 28px 28px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.dlg-head h2 { font-size: 22px; }
+.dlg-close { min-width: 44px; min-height: 44px; border: 0; background: transparent; font-size: 20px; cursor: pointer; border-radius: 8px; color: var(--slate-700); }
+.dlg-close:hover { background: var(--slate-100); }
+.dlg-actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.dlg-actions .btn { padding: 12px 24px; font-size: 15px; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 200; max-width: min(560px, 92vw); padding: 14px 20px; border-radius: 12px; background: var(--navy-800); color: #fff; font-size: 14px; box-shadow: 0 12px 30px rgba(0,0,0,.3); }
+.toast.err { background: #991b1b; }
+@media (max-width: 768px) {
+  .admin-h { font-size: 24px; }
+  #job-dialog form { padding: 18px; }
+  .admin-nav { padding-bottom: 8px; }
+  .header-inner:has(.admin-nav) { height: auto; flex-wrap: wrap; padding-top: 8px; }
+  body.admin-body { padding-bottom: 0; }
+}
+.table-wrap { position: relative; }   /* keeps screen-reader-only text inside the scroll box so the page never scrolls sideways */

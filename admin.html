@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin | Devan Placements</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#07152b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-noindex class="admin-body">
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <span class="brand">Devan <span>Placements</span> <small class="admin-tag">Admin</small></span>
+    <nav class="admin-nav" id="admin-nav" aria-label="Admin sections" hidden>
+      <button type="button" data-tab="overview" aria-current="page">Overview</button>
+      <button type="button" data-tab="jobs">Jobs</button>
+      <button type="button" data-tab="subs">Applications &amp; enquiries</button>
+      <a href="index.html" target="_blank" rel="noopener">View website</a>
+      <button type="button" id="logout" class="btn-logout">Log out</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- LOGIN -->
+  <section class="section" id="login-view">
+    <div class="container">
+      <form class="form-card login-card" id="login-form" novalidate>
+        <h1>Admin login</h1>
+        <p class="sub">Enter the admin password to manage jobs and see applications.</p>
+        <label>Password
+          <input type="password" id="password" autocomplete="current-password" required />
+        </label>
+        <p class="form-status" id="login-status" role="status" aria-live="polite"></p>
+        <button type="submit" class="btn btn-gold btn-block">Log in</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <div id="app-view" hidden>
+
+    <section class="section admin-panel" id="tab-overview">
+      <div class="container">
+        <h1 class="admin-h">Overview</h1>
+        <div class="stat-grid" id="stat-grid" aria-live="polite"></div>
+        <h2 class="admin-h2">Latest applications</h2>
+        <div class="table-wrap" id="recent-wrap"><p class="empty-state">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="section admin-panel" id="tab-jobs" hidden>
+      <div class="container">
+        <div class="admin-head">
+          <h1 class="admin-h">Jobs</h1>
+          <button type="button" class="btn btn-gold" id="new-job">+ Post a new job</button>
+        </div>
+        <div class="toolbar">
+          <label>Search<input type="search" id="job-search" placeholder="Title, country or code" /></label>
+          <label>Show
+            <select id="job-status-filter">
+              <option value="">All jobs</option>
+              <option value="Active">Active only</option>
+              <option value="Closed">Closed only</option>
+            </select>
+          </label>
+          <p id="job-count" role="status" aria-live="polite"></p>
+        </div>
+        <div class="table-wrap" id="jobs-wrap"><p class="empty-state">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="section admin-panel" id="tab-subs" hidden>
+      <div class="container">
+        <div class="admin-head">
+          <h1 class="admin-h">Applications &amp; enquiries</h1>
+          <button type="button" class="btn btn-navy" id="csv-btn">Download CSV</button>
+        </div>
+        <div class="toolbar">
+          <label>List
+            <select id="sub-type">
+              <option value="application">Job applications</option>
+              <option value="candidate">Candidate registrations</option>
+              <option value="enquiry">Vacancy enquiries</option>
+              <option value="employer">Employer enquiries</option>
+              <option value="contact">Contact messages</option>
+            </select>
+          </label>
+          <label>Search<input type="search" id="sub-search" placeholder="Name, phone, job..." /></label>
+          <p id="sub-count" role="status" aria-live="polite"></p>
+        </div>
+        <div class="table-wrap" id="subs-wrap"><p class="empty-state">Loading…</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- JOB FORM -->
+<dialog id="job-dialog" aria-labelledby="dlg-title">
+  <form id="job-form" novalidate>
+    <div class="dlg-head">
+      <h2 id="dlg-title">Post a new job</h2>
+      <button type="button" class="dlg-close" id="dlg-close" aria-label="Close">✕</button>
+    </div>
+    <div class="form-grid" id="job-fields"></div>
+    <datalist id="country-list"></datalist>
+    <p class="form-status" id="job-status" role="status" aria-live="polite"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn btn-outline" id="dlg-cancel">Cancel</button>
+      <button type="submit" class="btn btn-gold" id="job-save">Save job</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="site.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
