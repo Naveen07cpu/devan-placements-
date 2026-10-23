@@ -452,3 +452,9 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
   body.admin-body { padding-bottom: 0; }
 }
 .table-wrap { position: relative; }   /* keeps screen-reader-only text inside the scroll box so the page never scrolls sideways */
+
+/* social icons in the footer */
+.social-list a { min-width: 44px; justify-content: center; }
+.social-list .social-icon { padding: 0 11px; border-radius: 999px; }   /* round with an icon, a pill if the icon file is missing and the name shows */
+.social-list .social-icon img { width: 22px; height: 22px; filter: invert(1); }   /* black icon files become white */
+.social-list a:hover { background: rgba(255,255,255,.12); text-decoration: none; }
