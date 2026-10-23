@@ -11,16 +11,16 @@ const SITE = {
   phone: "+91 86810 22518",
   whatsappNumber: "918681022518",          // digits only, with country code
   email: "devanplacements@gmail.com",
-  address: "",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
-  hours: "",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "",                              // Google Maps share link of the office
+  address: "No: 6 1st Floor Eswaran Koil St, Koyambedu landmark: Koyambedu Post Office CH- 600107 Tamil Nadu",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
+  hours: "9:00 AM -7:00PM ",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
+  mapsUrl: "https://maps.app.goo.gl/ouA95eN1xhebt7wr7",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.com",// change when the real domain is live
   social: {
-    Instagram: "https://instagram.com/devanplacements",
-    Facebook: "",
+    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
+    Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
     WhatsApp: "",                           // filled automatically from whatsappNumber
-    Telegram: "",
+    Telegram: "https://t.me/Devanplacements",
     LinkedIn: "",
     YouTube: "",
   },
