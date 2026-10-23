@@ -79,7 +79,7 @@ function renderChrome() {
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
   if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
   // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
   const socialHtml = Object.entries(social)
     .filter(([, url]) => url)
     .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
