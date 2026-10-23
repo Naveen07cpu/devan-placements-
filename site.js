@@ -3,7 +3,7 @@
    EDIT THE SETTINGS BELOW. Empty values are simply hidden on the site.
    ========================================================== */
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweiLXX7eHazCMPhLBlmdTpm28O4zuUvElir6pk_rH76oBcuUU8LYaK-eLzmFAbd-33Ag/exec";
+const SCRIPT_URL = "https://script.google.com/macros/library/d/1XHWQPAUy12liITR2AJStt87c_JGuxKSlYoXcgBQ2tAR-J7IXrl5yZIzl/4";
 
 const SITE = {
   name: "Devan Placements",
