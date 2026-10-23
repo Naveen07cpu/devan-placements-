@@ -3,23 +3,24 @@
    EDIT THE SETTINGS BELOW. Empty values are simply hidden on the site.
    ========================================================== */
 
-   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMz6CfIquzkq3l9JwbIzjEJV-y_vSKlh5diG4T4f-TMQfqD6mSCQcB2zMEAH1dD0pU/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMz6CfIquzkq3l9JwbIzjEJV-y_vSKlh5diG4T4f-TMQfqD6mSCQcB2zMEAH1dD0pU/exec";
+
 const SITE = {
   name: "Devan Placements",
   legalName: "Devan Enterprises",
   phone: "+91 86810 22518",
   whatsappNumber: "918681022518",          // digits only, with country code
   email: "devanplacements@gmail.com",
-  address: "no:6 1st floor eswaran koil st landmark: koyambedu post office ch-600107",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
-  hours: "9.00AM - 7.00PM",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "https://maps.app.goo.gl/xMuHyDChv8bxYiMg8?g_st=com.google.maps.preview.copy",                              // Google Maps share link of the office
+  address: "",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
+  hours: "",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
+  mapsUrl: "",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.com",// change when the real domain is live
   social: {
-    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
-    Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
+    Instagram: "https://instagram.com/devanplacements",
+    Facebook: "",
     WhatsApp: "",                           // filled automatically from whatsappNumber
-    Telegram: "https://t.me/Devanplacements",
+    Telegram: "",
     LinkedIn: "",
     YouTube: "",
   },
@@ -77,9 +78,12 @@ function renderChrome() {
   const home = isHome() ? "" : "index.html";
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
   if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
+  // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "maps" };
   const socialHtml = Object.entries(social)
     .filter(([, url]) => url)
-    .map(([name, url]) => `<li><a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}<span class="sr-only"> (opens in a new tab)</span></a></li>`)
+    .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
+      `<img src="images/icons/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
     .join("");
 
   const header = $("#site-header");
@@ -172,6 +176,7 @@ function renderChrome() {
 
 /* ---------- search-engine data (JSON-LD) ---------- */
 function injectStructuredData() {
+  if (document.body.hasAttribute("data-noindex")) return;   // admin page: keep out of search results
   const sameAs = Object.values(SITE.social).filter(Boolean);
   const data = {
     "@context": "https://schema.org", "@type": "EmploymentAgency", name: SITE.name, legalName: SITE.legalName,
@@ -187,12 +192,28 @@ function injectStructuredData() {
   document.head.appendChild(s);
 }
 
+/* ---------- clean up what comes from the sheet ---------- */
+function normalizeJob(j) {
+  const o = {};
+  Object.keys(j).forEach((k) => {
+    let v = j[k];
+    if (typeof v === "string" && /^#(ERROR|N\/A|REF|VALUE|NAME|DIV)/i.test(v.trim())) v = "";   // spreadsheet error cells
+    o[k] = v;
+  });
+  const c = String(o.country || "").trim();
+  const known = Object.keys(COUNTRY_FLAGS).find((x) => x.toLowerCase() === c.toLowerCase());
+  o.country = known === "UAE" ? "United Arab Emirates" : (known || c.replace(/\b\w/g, (m) => m.toUpperCase()));
+  const cat = CATEGORY_LIST.find((x) => x.toLowerCase() === String(o.category || "").trim().toLowerCase());
+  if (cat) o.category = cat;
+  return o;
+}
+
 /* ---------- jobs from Google Sheet ---------- */
 async function loadJobs() {
   const key = "dp_jobs_v2";
   try {
     const c = JSON.parse(sessionStorage.getItem(key) || "null");
-    if (c && Date.now() - c.t < 60000) return { jobs: c.jobs, sample: false };
+    if (c && Date.now() - c.t < 60000) return { jobs: c.jobs.map(normalizeJob), sample: false };
   } catch (e) { /* storage unavailable */ }
 
   try {
@@ -201,7 +222,7 @@ async function loadJobs() {
     const data = await res.json();
     if (data.result !== "success") throw new Error(data.message || "bad response");
     try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), jobs: data.jobs })); } catch (e) { /* ignore */ }
-    return { jobs: data.jobs, sample: false };
+    return { jobs: data.jobs.map(normalizeJob), sample: false };
   } catch (err) {
     console.warn("Could not load live jobs:", err);
     if (SITE.sampleJobsOnError) return { jobs: SAMPLE_JOBS, sample: true };
