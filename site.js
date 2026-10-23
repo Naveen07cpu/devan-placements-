@@ -83,7 +83,7 @@ function renderChrome() {
   const socialHtml = Object.entries(social)
     .filter(([, url]) => url)
     .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
-      `<img src="images/icons/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
+      `<img src="images/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
     .join("");
 
   const header = $("#site-header");
