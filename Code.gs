@@ -330,6 +330,7 @@ function saveJob_(ss, job, originalCode) {
   if (!clean.title) return { result: "error", message: "Job title is required." };
   if (!clean.country) return { result: "error", message: "Country is required." };
   if (clean.image && !/^https:\/\/\S+$/i.test(clean.image)) return { result: "error", message: "Poster link must start with https://" };
+  if (clean.code && !/^[A-Za-z0-9_-]{2,30}$/.test(clean.code)) return { result: "error", message: "Job code can use only letters, numbers, dashes and underscores (2 to 30 characters, no spaces)." };
   clean.status = clean.status === "Closed" ? "Closed" : "Active";
   clean.showEmployer = String(clean.showEmployer).toLowerCase() === "yes" ? "Yes" : "No";
 
