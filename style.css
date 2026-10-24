@@ -648,3 +648,25 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 .social-list .social-icon:hover {
   background: rgba(255,255,255,.15);
 }
+
+/* ===== FOLLOW US BUTTONS ===== */
+.social-list { display: flex !important; flex-wrap: wrap; gap: 12px !important; }
+
+.social-list a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 48px; min-height: 48px;
+  border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+  color: #fff; font-size: 13px;
+  transition: background .15s, border-color .15s;
+}
+
+/* round icon button */
+.social-list .social-icon { width: 48px; height: 48px; padding: 0; border-radius: 50%; }
+.social-list .social-icon img { width: 24px; height: 24px; filter: invert(1); }  /* white icons; use "none" if your icons are already colored */
+
+/* if an icon file is missing, show the name in a pill instead of squashed in a circle */
+.social-list .social-icon.text-only { width: auto; padding: 0 16px; border-radius: 999px; }
+
+/* hover and keyboard focus */
+.site-footer .social-list a:hover { background: rgba(255,255,255,.15); border-color: var(--gold); text-decoration: none; }
+.social-list a:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
