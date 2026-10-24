@@ -126,7 +126,7 @@ function renderJobs() {
     <tbody>${list.map((j) => {
       const active = j.status.toLowerCase() === "active";
       return `<tr>
-        <td>${esc(j.code)}</td><td class="wide"><strong>${esc(j.title)}</strong></td><td>${esc(j.country)}</td><td>${esc(j.vacancies)}</td><td>${esc(j.postedDate)}</td>
+        <td>${esc(j.code)}</td><td class="wide">${safeImageUrl(j.image) ? `<img class="thumb" src="${esc(safeImageUrl(j.image))}" alt="" loading="lazy" />` : ""}<strong>${esc(j.title)}</strong></td><td>${esc(j.country)}</td><td>${esc(j.vacancies)}</td><td>${esc(j.postedDate)}</td>
         <td><span class="status ${active ? "on" : "off"}">${active ? "Active" : "Closed"}</span></td>
         <td class="actions">
           <button type="button" data-act="edit" data-code="${esc(j.code)}">Edit<span class="sr-only"> ${esc(j.title)}</span></button>
@@ -159,6 +159,7 @@ function openJobForm(job) {
     el.value = job ? (job[key] || "") : (key === "status" ? "Active" : key === "showEmployer" ? "No" : "");
   });
   showStatus($("#job-status"), "", "");
+  setPoster(job ? job.image || "" : "");
   $("#job-dialog").showModal();
   $("#f-title").focus();
 }
@@ -173,6 +174,11 @@ async function saveJob(e) {
   const btn = $("#job-save");
   btn.disabled = true; btn.textContent = "Saving...";
   try {
+    if (poster.pending) {                      // upload the new poster first, then save the job with its link
+      const up = await adminCall("uploadJobImage", poster.pending);
+      poster.url = up.url; poster.pending = null;
+    }
+    job.image = poster.url;
     const d = await adminCall("saveJob", { job, originalCode: editingCode });
     $("#job-dialog").close();
     toast(`${d.created ? "Job posted" : "Job updated"} (${d.code}). It is live on the website within about a minute.`);
@@ -199,6 +205,51 @@ async function jobAction(act, code) {
     }
     loadJobsList();
   } catch (err) { handleError(err); }
+}
+
+/* ---------- poster image ---------- */
+const poster = { url: "", pending: null };
+
+function showPoster(src) {
+  const img = $("#poster-preview");
+  if (src) { img.src = src; img.hidden = false; } else { img.removeAttribute("src"); img.hidden = true; }
+  $("#poster-remove").hidden = !src;
+}
+
+function setPoster(url) {
+  poster.url = url || ""; poster.pending = null;
+  $("#poster-file").value = ""; $("#poster-msg").textContent = "";
+  showPoster(safeImageUrl(poster.url));
+}
+
+// shrink big photos to max 1200px wide JPEG so uploads are fast and small
+function resizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1200 / img.width);
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      const dataUrl = c.toDataURL("image/jpeg", 0.85);
+      resolve({ dataUrl, imageBase64: dataUrl.split(",")[1], imageMime: "image/jpeg", imageName: "poster.jpg" });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read this image.")); };
+    img.src = url;
+  });
+}
+
+async function onPosterChosen(file) {
+  const msg = $("#poster-msg");
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { msg.textContent = "Please choose a JPG, PNG or WebP image."; return; }
+  if (file.size > 15 * 1024 * 1024) { msg.textContent = "That image is too big (over 15MB)."; return; }
+  try {
+    const r = await resizeImage(file);
+    poster.pending = { imageBase64: r.imageBase64, imageMime: r.imageMime, imageName: r.imageName };
+    showPoster(r.dataUrl);
+    msg.textContent = "Image ready. It uploads when you click Save job.";
+  } catch (err) { msg.textContent = err.message; }
 }
 
 /* ---------- applications & enquiries ---------- */
@@ -262,6 +313,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#logout").addEventListener("click", () => logout());
   $$("#admin-nav [data-tab]").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
   $("#new-job").addEventListener("click", () => openJobForm(null));
+  $("#poster-file").addEventListener("change", (e) => e.target.files[0] && onPosterChosen(e.target.files[0]));
+  $("#poster-remove").addEventListener("click", () => { poster.url = ""; poster.pending = null; $("#poster-file").value = ""; $("#poster-msg").textContent = "Image removed. Click Save job to apply."; showPoster(""); });
   $("#job-form").addEventListener("submit", saveJob);
   $("#dlg-close").addEventListener("click", () => $("#job-dialog").close());
   $("#dlg-cancel").addEventListener("click", () => $("#job-dialog").close());
