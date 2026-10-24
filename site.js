@@ -107,7 +107,7 @@ function renderChrome() {
     .filter(([, url]) => typeof url === "string" && url.trim() !== "")
     .map(([name, url]) => {
       const custom = (SITE.iconFiles && SITE.iconFiles[name]) || "";
-      const base = custom || (ICONS[name] ? 'images/${ICONS[name]}.svg': "");
+      const base = custom || (ICONS[name] ? SITE.iconFolder + ICONS[name] : "");
       const first = custom ? custom : base ? base + ".svg" : "";
       const inner = first
         ? `<img src="${esc(first)}" alt="" data-base="${esc(base)}" data-custom="${custom ? "1" : ""}" data-name="${esc(name)}" onerror="iconFallback(this)" /><span class="sr-only">${esc(name)}</span>`
