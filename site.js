@@ -30,6 +30,26 @@ const SITE = {
     LinkedIn: "",
     YouTube: "",
   },
+  // Documents shown on every job page. A job's own "Required documents" (set in admin) replaces this list for that job.
+  documentsIntro: "Kindly send the following documents in ONE SINGLE PDF FILE for your job application.",
+  documentsFooter: 'Name your PDF file as: "Full Name_Passport Number.pdf"',
+  defaultDocuments: [
+    "Updated Resume / CV",
+    "Passport: front and back. Clear colour scan of the personal particulars page and any relevant amendment pages",
+    "10th Standard Mark Sheet / Certificate",
+    "12th Standard Mark Sheet / Certificate (if applicable)",
+    "Diploma / ITI / Degree Certificate (as applicable to the job)",
+    "Complete Degree / Diploma Mark Sheets (all semesters or years, if applicable)",
+    "Experience Certificate (if available)",
+    "Other Job-Related Certificates / Technical Certificates (if applicable)",
+    "Vaccination Certificate",
+    "Indian Driving Licence: front and back",
+    "Aadhar Card & Pan Card",
+    "Singapore Class 3 / 3A / 3C Licence (if applicable)",
+    "Previous Singapore Work Permit / FIN Details / Old Permit Copy (for Singapore return candidates)",
+    "Recent Full-Size Photograph. Please mention your Height (cm) and Weight (kg)",
+    "Additional certificates or documents required for the specific job, if applicable",
+  ],
   // While testing, show sample vacancies if the Google Sheet cannot be reached.
   // Set to false before launch so visitors never see sample jobs.
   sampleJobsOnError: true,
