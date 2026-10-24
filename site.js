@@ -17,7 +17,7 @@ const SITE = {
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.in",// change when the real domain is live
   social: {
-    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
+    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu"",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
     WhatsApp: "",                           // filled automatically from whatsappNumber
     Telegram: "https://t.me/Devanplacements",
@@ -80,11 +80,14 @@ function renderChrome() {
   if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
   // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
   const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
-  const socialHtml = Object.entries(social)
-    .filter(([, url]) => url)
-    .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
-      `<img src="images/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
-    .join("");
+  const socialHtml = Object.entries(SITE.social || {})
+  .filter(([name, url]) => typeof url === "string" && url.trim() !== "")
+  .map(([name, url]) => {
+    const safeUrl = esc(url);
+    const safeName = esc(name);
+    return `<li><a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeName}</a></li>`;
+  })
+  .join("");
 
   const header = $("#site-header");
   if (header) {
