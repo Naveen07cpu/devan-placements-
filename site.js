@@ -382,3 +382,74 @@ document.addEventListener("DOMContentLoaded", () => {
   renderChrome();
   injectStructuredData();
 });
+/* ==========================================
+   DEVAN PLACEMENTS - JOB SHARING
+   ========================================== */
+
+function getJobShareUrl(code) {
+  const url = new URL("job.html", window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("id", code);
+  return url.href;
+}
+
+async function shareJob(code, title, country) {
+  const url = getJobShareUrl(code);
+  const text = `${title} - ${country}\nDevan Placements`;
+
+  // Use the phone's native share menu when supported
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `${title} | Devan Placements`,
+        text,
+        url
+      });
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") return;
+    }
+  }
+
+  // Otherwise, share through WhatsApp
+  const message = `${text}\n\nApply here:\n${url}`;
+
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(message)}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+async function copyJobLink(code) {
+  const url = getJobShareUrl(code);
+
+  try {
+    await navigator.clipboard.writeText(url);
+    alert("Job link copied successfully!");
+  } catch (error) {
+    window.prompt("Copy this job link:", url);
+  }
+}
+
+/* Event handling for dynamically created job cards */
+document.addEventListener("click", (event) => {
+  const shareButton = event.target.closest("[data-share-job]");
+  const copyButton = event.target.closest("[data-copy-job]");
+
+  if (shareButton) {
+    event.preventDefault();
+
+    shareJob(
+      shareButton.dataset.shareJob,
+      shareButton.dataset.title || "Job Vacancy",
+      shareButton.dataset.country || ""
+    );
+  }
+
+  if (copyButton) {
+    event.preventDefault();
+    copyJobLink(copyButton.dataset.copyJob);
+  }
+});
