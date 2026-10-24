@@ -92,7 +92,7 @@ function renderChrome() {
       <a class="skip-link" href="#main">Skip to main content</a>
       <header class="site-header">
         <div class="container header-inner">
-         <a href="${home || '#home'}" class="brand"> <img src="images/logo.svg" alt="Devan Placements Logo" class="brand-logo"> <span class="brand-text"> Devan <span>Placements</span> </span></a>
+         <a href="${home || '#home'}" class="brand"> <img src="images/devan placement logos.svg" alt="Devan Placements Logos" class="brand-logo"> <span class="brand-text"> Devan <span>Placements</span> </span></a>
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu"><span aria-hidden="true">☰</span></button>
           <nav class="nav-menu" id="nav-menu" aria-label="Main">
             <a href="${home}#about">About</a>
