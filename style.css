@@ -502,3 +502,48 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 .poster-btn:focus-within { outline: 3px solid var(--navy-600); outline-offset: 2px; }
 .poster-msg { margin: 8px 0 0; font-size: 13px; color: var(--slate-600); }
 .data-table .thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; vertical-align: middle; margin-right: 10px; border: 1px solid var(--slate-200); }
+/* DEVAN PLACEMENTS - ADMIN JOB FORM */
+
+#job-dialog {
+  width: min(95vw, 1000px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+}
+
+#job-dialog .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+#job-dialog .form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 600;
+}
+
+#job-dialog .form-grid input,
+#job-dialog .form-grid select,
+#job-dialog .form-grid textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+#job-dialog .form-grid .full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  #job-dialog .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #job-dialog .form-grid .full {
+    grid-column: auto;
+  }
+}
