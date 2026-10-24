@@ -11,16 +11,16 @@ const SITE = {
   phone: "+91 86810 22518",
   whatsappNumber: "918681022518",          // digits only, with country code
   email: "devanplacements@gmail.com",
-  address: "",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
-  hours: "",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "",                              // Google Maps share link of the office
+  address: "no:6 1st floor eswaran koil st, koyambedu, landmark : koyambedu post office ",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
+  hours: "9:00 AM to 7:00 PM",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
+  mapsUrl: "https://maps.app.goo.gl/2DCJLJTPDmrEjZN17",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.com",// change when the real domain is live
   social: {
-    Instagram: "https://instagram.com/devanplacements",
-    Facebook: "",
+    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
+    Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
     WhatsApp: "",                           // filled automatically from whatsappNumber
-    Telegram: "",
+    Telegram: "https://t.me/Devanplacements",
     LinkedIn: "",
     YouTube: "",
   },
@@ -79,11 +79,11 @@ function renderChrome() {
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
   if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
   // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "maps" };
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
   const socialHtml = Object.entries(social)
     .filter(([, url]) => url)
     .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
-      `<img src="images/icons/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
+      `<img src="images/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
     .join("");
 
   const header = $("#site-header");
