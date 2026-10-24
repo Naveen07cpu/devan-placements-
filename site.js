@@ -98,10 +98,10 @@ function renderChrome() {
 
   // social links: WhatsApp is filled from the number, Google Maps from mapsUrl
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
+  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
 
   // Icon file for each link: <iconFolder>/<name>.svg (png, webp, jpg also tried). If no file is found, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
 
   const socialHtml = Object.entries(social)
     .filter(([, url]) => typeof url === "string" && url.trim() !== "")
