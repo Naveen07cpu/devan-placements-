@@ -6,29 +6,110 @@ let JOBS = [];
 let SUBS = { headers: [], rows: [], total: 0, type: "application" };
 
 const FIELDS = [
-  ["code", "Job code (leave empty to create it automatically)", "text", false, { ph: "e.g. JOB-010 or DP-QA-001" }],
-  ["title", "Job title", "text", true],
-  ["country", "Country", "text", true, { list: "country-list" }],
-  ["category", "Category", "select", false, { options: CATEGORY_LIST, blank: "Choose category" }],
-  ["vacancies", "Vacancies (number)", "number"],
-  ["employer", "Employer name", "text"],
-  ["showEmployer", "Show employer name on the website?", "select", false, { options: ["No", "Yes"] }],
-  ["salary", "Salary", "text"],
-  ["hours", "Working hours", "text", false, { ph: "e.g. 8 hours/day, 6 days/week" }],
-  ["accommodation", "Accommodation", "text"],
+
+  // SECTION 1: BASIC JOB INFORMATION
+
+  ["code", "Job Code (leave empty to generate automatically)", "text", false],
+
+  ["title", "Position / Job Title", "text", true],
+
+  ["country", "Country", "text", true,
+    { list: "country-list" }],
+
+  ["permitIndustry", "Permit / Industry", "text"],
+
+  ["category", "Job Category", "select", false,
+    { options: CATEGORY_LIST, blank: "Choose Category" }],
+
+  ["vacancies", "Number of Vacancies", "number"],
+
+  ["salary", "Salary", "text", false,
+    { ph: "e.g. SGD 1800 - 2200" }],
+
+  ["candidateType", "Freshers or Experienced", "select", false,
+    { options: ["Freshers", "Experienced", "Both"] }],
+
+  ["experience", "Experience (1 to 10 Years)", "text", false,
+    { ph: "e.g. 2 - 5 Years" }],
+
+
+  // SECTION 2: FACILITIES AND BENEFITS
+
+  ["accommodation", "Housing / Accommodation", "text"],
+
   ["food", "Food", "text"],
-  ["contract", "Contract terms", "text", false, { ph: "e.g. 2 years, renewable" }],
-  ["eligibility", "Eligibility", "text"],
-  ["education", "Education", "text"],
-  ["ageLimit", "Age limit", "text", false, { ph: "e.g. 25 - 45" }],
-  ["experience", "Experience (start with a number)", "text", false, { ph: "e.g. 3 - 5 Years" }],
-  ["nature", "Nature of job", "text", false, { ph: "e.g. Full time, on-site" }],
-  ["contactPerson", "Contact person", "text"],
-  ["contactPhone", "Contact phone", "tel"],
-  ["role", "Job role", "textarea"],
-  ["scope", "Job scope", "textarea"],
-  ["description", "Short description (shown on the job card)", "textarea"],
-  ["status", "Status", "select", false, { options: ["Active", "Closed"] }],
+
+  ["transport", "Transport", "text"],
+
+  ["allowances", "Allowances", "textarea"],
+
+  ["otherBenefits", "Other Benefits", "textarea"],
+
+  ["deductions", "Deductions", "textarea"],
+
+
+  // SECTION 3: CANDIDATE REQUIREMENTS
+
+  ["gender", "Gender", "select", false,
+    { options: ["Any", "Male", "Female"] }],
+
+  ["ageLimit", "Age Limit", "text", false,
+    { ph: "e.g. 21 - 40 Years" }],
+
+  ["education", "Education Qualification", "text"],
+
+  ["eligibility", "Eligibility Criteria", "textarea"],
+
+  ["documentsRequired", "Documents Required", "textarea"],
+
+
+  // SECTION 4: WORKING CONDITIONS
+
+  ["hours", "Working Hours", "text", false,
+    { ph: "e.g. 8 Hours per Day" }],
+
+  ["weeklyOff", "Weekly / Monthly Off", "text"],
+
+  ["overtime", "Overtime Details", "text"],
+
+  ["contract", "Contract Duration", "text"],
+
+  ["nature", "Nature of Job", "textarea"],
+
+
+  // SECTION 5: JOB DESCRIPTION
+
+  ["role", "Job Role", "textarea"],
+
+  ["scope", "Job Scope", "textarea"],
+
+  ["description", "Short Description", "textarea"],
+
+
+  // SECTION 6: INTERVIEW INFORMATION
+
+  ["interviewDate", "Interview Date", "date"],
+
+  ["selectionProcess", "Selection Process", "textarea"],
+
+
+  // SECTION 7: CONTACT INFORMATION
+
+  ["contactPerson", "Contact Person", "text"],
+
+  ["contactPhone", "Contact Number", "tel"],
+
+
+  // EXISTING WEBSITE FEATURES
+
+  ["employer", "Employer Name", "text"],
+
+  ["showEmployer", "Show Employer Name?", "select", false,
+    { options: ["No", "Yes"] }],
+
+  ["status", "Job Status", "select", false,
+    { options: ["Active", "Closed"] }]
+
 ];
 
 /* ---------- helpers ---------- */
