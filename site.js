@@ -262,7 +262,24 @@ function jobCardHTML(j) {
       </div>
     </article>`;
 }
+<button
+  type="button"
+  class="btn btn-outline job-share-btn"
+  data-share-job="${esc(j.code)}"
+  data-title="${esc(j.title)}"
+  data-country="${esc(j.country)}"
+  aria-label="Share ${esc(j.title)} vacancy"
+>
+  ↗ Share Job
+</button>
 
+<button
+  type="button"
+  class="btn btn-outline job-copy-btn"
+  data-copy-job="${esc(j.code)}"
+>
+  🔗 Copy Link
+</button>
 /* ---------- forms ---------- */
 const MAX_FILE_MB = 5;
 const ALLOWED_EXT = ["pdf", "doc", "docx"];
