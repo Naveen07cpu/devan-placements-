@@ -17,7 +17,7 @@ const SITE = {
   mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",   // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.in",// change when the real domain is live
-  iconFolder: "images/icons/",              // folder that holds your social icons (svg, png or webp are all tried)
+  iconFolder: "images/",                    // folder that holds your social icons, e.g. images/instagram.svg (svg, png, webp, jpg are all tried)
   iconFiles: {                              // only fill this if an icon has a different file name, e.g. Instagram: "images/icons/insta.png"
     Instagram: "", Facebook: "", WhatsApp: "", Telegram: "", LinkedIn: "", YouTube: "", "Google Maps": "",
   },
@@ -80,6 +80,17 @@ const waLink = (msg) => `https://wa.me/${SITE.whatsappNumber}` + (msg ? `?text=$
 const flagOf = (country) => COUNTRY_FLAGS[country] || "🌐";
 const isHome = () => /(^|\/)(index\.html)?$/.test(location.pathname);
 
+/* drawn icons for the Follow us buttons (24x24, white via currentColor) */
+const ICON_SVG = {
+  Instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>',
+  Facebook: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  WhatsApp: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+  Telegram: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  LinkedIn: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>',
+  YouTube: '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>',
+  "Google Maps": '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+};
+
 /* tries the next image type when an icon file is not found, then falls back to the text name */
 function iconFallback(img) {
   const exts = ["svg", "png", "webp", "jpg"];
@@ -88,6 +99,9 @@ function iconFallback(img) {
     img.dataset.i = next;
     img.src = `${img.dataset.base}.${exts[next]}`;
   } else {
+    const link = img.closest("a");
+    if (link) link.classList.add("text-only");     // lets the CSS turn the round button into a text pill
+    console.warn("Icon not found:", img.dataset.name, "->", img.src);
     img.replaceWith(document.createTextNode(img.dataset.name));
   }
 }
@@ -98,21 +112,22 @@ function renderChrome() {
 
   // social links: WhatsApp is filled from the number, Google Maps from mapsUrl
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
+  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
 
-  // Icon file for each link: <iconFolder>/<name>.svg (png, webp, jpg also tried). If no file is found, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
-
+  // Icons are drawn inside this file (no image files needed). To use your own image for one link,
+  // put its path in SITE.iconFiles, e.g. Instagram: "images/instagram.svg".
   const socialHtml = Object.entries(social)
     .filter(([, url]) => typeof url === "string" && url.trim() !== "")
     .map(([name, url]) => {
       const custom = (SITE.iconFiles && SITE.iconFiles[name]) || "";
-      const base = custom || (ICONS[name] ? SITE.iconFolder + ICONS[name] : "");
-      const first = custom ? custom : base ? base + ".svg" : "";
-      const inner = first
-        ? `<img src="${esc(first)}" alt="" data-base="${esc(base)}" data-custom="${custom ? "1" : ""}" data-name="${esc(name)}" onerror="iconFallback(this)" /><span class="sr-only">${esc(name)}</span>`
-        : esc(name);
-      return `<li><a${first ? ' class="social-icon"' : ""} href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(name)}">${inner}</a></li>`;
+      const svg = ICON_SVG[name];
+      const inner = custom
+        ? `<img src="${esc(custom)}" alt="" data-name="${esc(name)}" data-custom="1" onerror="iconFallback(this)" />`
+        : svg
+          ? `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${svg}</svg>`
+          : "";
+      const label = `<span class="sr-only">${esc(name)}</span>`;
+      return `<li><a${inner ? ' class="social-icon"' : ""} href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(name)}">${inner ? inner + label : esc(name)}</a></li>`;
     })
     .join("");
 
