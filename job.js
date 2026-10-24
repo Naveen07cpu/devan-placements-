@@ -22,6 +22,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#job-badges").innerHTML = [`CODE: ${job.code}`, `${job.country} ${flagOf(job.country)}`, job.category, job.postedDate && `Posted ${job.postedDate}`]
     .filter(Boolean).map((b) => `<span class="badge">${esc(b)}</span>`).join("");
 
+  // poster image (optional)
+  const poster = safeImageUrl(job.image);
+  if (poster) {
+    $("#job-poster").src = poster;
+    $("#job-poster").alt = `${job.title} job poster (opens full size)`;
+    $("#poster-link").href = poster;
+    $("#sec-poster").hidden = false;
+  }
+
   // overview
   $("#job-desc").textContent = desc;
 
