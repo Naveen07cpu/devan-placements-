@@ -110,6 +110,20 @@
       <button type="button" class="dlg-close" id="dlg-close" aria-label="Close">✕</button>
     </div>
     <div class="form-grid" id="job-fields"></div>
+    <div class="poster-field">
+      <div class="field-label">Poster image (optional)</div>
+      <p class="sub">JPG, PNG or WebP. It is resized for you. The job details above still show as text, so Google and screen readers can read them.</p>
+      <div class="poster-row">
+        <img id="poster-preview" alt="Poster preview" hidden />
+        <div>
+          <label class="btn btn-outline poster-btn">Choose image
+            <input type="file" id="poster-file" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+          </label>
+          <button type="button" class="link-btn" id="poster-remove" hidden>Remove image</button>
+          <p class="poster-msg" id="poster-msg" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
     <datalist id="country-list"></datalist>
     <p class="form-status" id="job-status" role="status" aria-live="polite"></p>
     <div class="dlg-actions">
