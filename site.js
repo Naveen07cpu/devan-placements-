@@ -15,7 +15,7 @@ const SITE = {
   hours: "9:00 AM -7:00PM ",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
   mapsUrl: "https://maps.app.goo.gl/nAKrBiLzSoCuwda36",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
-  domain: "https://www.devanplacements.in",// change when the real domain is live
+  domain: "https://www.devanplacement.in/",// change when the real domain is live
   social: {
     Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
