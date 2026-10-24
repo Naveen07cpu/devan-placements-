@@ -81,7 +81,7 @@ function renderChrome() {
 
   // social links: WhatsApp is filled from the number, Google Maps from mapsUrl
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
+  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
 
   // Icon file for each link: images/icons/<name>.svg. If the file is missing, the text name is shown instead.
   const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
