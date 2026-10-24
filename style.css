@@ -547,3 +547,39 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
     grid-column: auto;
   }
 }
+/* DEVAN PLACEMENTS - JOB DETAILS */
+
+#facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#facts .fact {
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+#facts .fact dt {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+#facts .fact dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #07152b;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+@media (max-width: 768px) {
+  #facts {
+    grid-template-columns: 1fr;
+  }
+}
