@@ -15,7 +15,7 @@ const SITE = {
   hours: "9:00 AM to 7:00 PM",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
   mapsUrl: "https://maps.app.goo.gl/2DCJLJTPDmrEjZN17",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
-  domain: "https://www.devanplacements.com",// change when the real domain is live
+  domain: "https://www.devanplacements.in",// change when the real domain is live
   social: {
     Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
@@ -77,7 +77,7 @@ const isHome = () => /(^|\/)(index\.html)?$/.test(location.pathname);
 function renderChrome() {
   const home = isHome() ? "" : "index.html";
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
+  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
   // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
   const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
   const socialHtml = Object.entries(social)
