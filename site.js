@@ -13,7 +13,7 @@ const SITE = {
   email: "devanplacements@gmail.com",
   address: "no:6 1st floor eswaran koil st, koyambedu, landmark : koyambedu post office ",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
   hours: "9:00 AM to 7:00 PM",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "https://maps.app.goo.gl/2DCJLJTPDmrEjZN17",                              // Google Maps share link of the office
+  mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.in",// change when the real domain is live
   social: {
