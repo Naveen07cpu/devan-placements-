@@ -583,3 +583,49 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
     grid-template-columns: 1fr;
   }
 }
+/* ==========================================
+   DEVAN PLACEMENTS - SHARE JOB BUTTONS
+   ========================================== */
+
+.job-sharing {
+  margin-top: 25px;
+  padding: 22px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.job-sharing h3 {
+  margin: 0 0 15px;
+  color: #07152b;
+  font-size: 18px;
+}
+
+.job-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.job-share-btn,
+.job-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.job-share-actions .btn {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .job-share-actions {
+    flex-direction: column;
+  }
+
+  .job-share-actions .btn {
+    width: 100%;
+  }
+}
