@@ -17,6 +17,11 @@ const SITE = {
   mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",   // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.in",// change when the real domain is live
+  iconFolder: "images/icons/",              // folder that holds your social icons (svg, png or webp are all tried)
+  iconFiles: {                              // only fill this if an icon has a different file name, e.g. Instagram: "images/icons/insta.png"
+    Instagram: "", Facebook: "", WhatsApp: "", Telegram: "", LinkedIn: "", YouTube: "", "Google Maps": "",
+  },
+  logo: "images/devan%20placement%20logos.svg",   // logo file path (%20 = space). Must match the real file name exactly, including capitals
   social: {
     Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
@@ -75,25 +80,39 @@ const waLink = (msg) => `https://wa.me/${SITE.whatsappNumber}` + (msg ? `?text=$
 const flagOf = (country) => COUNTRY_FLAGS[country] || "🌐";
 const isHome = () => /(^|\/)(index\.html)?$/.test(location.pathname);
 
+/* tries the next image type when an icon file is not found, then falls back to the text name */
+function iconFallback(img) {
+  const exts = ["svg", "png", "webp", "jpg"];
+  const next = Number(img.dataset.i || 0) + 1;
+  if (!img.dataset.custom && next < exts.length) {
+    img.dataset.i = next;
+    img.src = `${img.dataset.base}.${exts[next]}`;
+  } else {
+    img.replaceWith(document.createTextNode(img.dataset.name));
+  }
+}
+
 /* ---------- 4. HEADER / FOOTER / FLOATING WHATSAPP ---------- */
 function renderChrome() {
   const home = isHome() ? "" : "index.html";
 
   // social links: WhatsApp is filled from the number, Google Maps from mapsUrl
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
+  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
 
-  // Icon file for each link: images/icons/<name>.svg. If the file is missing, the text name is shown instead.
+  // Icon file for each link: <iconFolder>/<name>.svg (png, webp, jpg also tried). If no file is found, the text name is shown instead.
   const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
 
   const socialHtml = Object.entries(social)
     .filter(([, url]) => typeof url === "string" && url.trim() !== "")
     .map(([name, url]) => {
-      const icon = ICONS[name];
-      const inner = icon
-        ? `<img src="images/icons/${icon}.svg" alt="" onerror="this.replaceWith(document.createTextNode(this.dataset.name))" data-name="${esc(name)}" /><span class="sr-only">${esc(name)}</span>`
+      const custom = (SITE.iconFiles && SITE.iconFiles[name]) || "";
+      const base = custom || (ICONS[name] ? SITE.iconFolder + ICONS[name] : "");
+      const first = custom ? custom : base ? base + ".svg" : "";
+      const inner = first
+        ? `<img src="${esc(first)}" alt="" data-base="${esc(base)}" data-custom="${custom ? "1" : ""}" data-name="${esc(name)}" onerror="iconFallback(this)" /><span class="sr-only">${esc(name)}</span>`
         : esc(name);
-      return `<li><a${icon ? ' class="social-icon"' : ""} href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(name)}">${inner}</a></li>`;
+      return `<li><a${first ? ' class="social-icon"' : ""} href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(name)}">${inner}</a></li>`;
     })
     .join("");
 
@@ -104,10 +123,11 @@ function renderChrome() {
       <a class="skip-link" href="#main">Skip to main content</a>
       <header class="site-header">
         <div class="container header-inner">
-          <a href="${home || "#home"}" class="brand"><img src="images/devan%20placement%20logos.svg" alt="Devan Placements logo" class="brand-logo" onerror="this.style.display='none'"><span class="brand-text">Devan <span>Placements</span></span></a>
+          <a href="${home || "#home"}" class="brand"><img src="${esc(SITE.logo)}" alt="Devan Placements logo" class="brand-logo" onerror="this.style.display='none'"><span class="brand-text">Devan <span>Placements</span></span></a>
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu"><span aria-hidden="true">☰</span></button>
           <nav class="nav-menu" id="nav-menu" aria-label="Main">
             <a href="${home}#about">About</a>
+            <a href="${home}#services">Services</a>
             <a href="${home}#countries">Countries</a>
             <a href="jobs.html">Active Jobs</a>
             <a href="${home}#how">Process</a>
@@ -145,6 +165,7 @@ function renderChrome() {
             <h2 class="foot-h">Quick links</h2>
             <ul>
               <li><a href="jobs.html">Active Jobs</a></li>
+              <li><a href="${home}#services">Training &amp; Placement</a></li>
               <li><a href="${home}#register">Candidate Registration</a></li>
               <li><a href="${home}#employers">For Employers</a></li>
               <li><a href="${home}#faq">FAQ</a></li>
@@ -453,7 +474,11 @@ document.addEventListener("click", (event) => {
 });
 
 /* ---------- 10. START ---------- */
-document.addEventListener("DOMContentLoaded", () => {
-  renderChrome();
-  injectStructuredData();
-});
+// runs now if the page is already loaded, otherwise when it finishes loading;
+// try/catch so one problem can never stop the header and footer from showing
+function startSite() {
+  try { renderChrome(); } catch (err) { console.error("Header/footer error:", err); }
+  try { injectStructuredData(); } catch (err) { console.error("Structured data error:", err); }
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startSite);
+else startSite();
