@@ -502,6 +502,7 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 .poster-btn:focus-within { outline: 3px solid var(--navy-600); outline-offset: 2px; }
 .poster-msg { margin: 8px 0 0; font-size: 13px; color: var(--slate-600); }
 .data-table .thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; vertical-align: middle; margin-right: 10px; border: 1px solid var(--slate-200); }
+
 /* DEVAN PLACEMENTS - ADMIN JOB FORM */
 
 #job-dialog {
@@ -583,6 +584,7 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
     grid-template-columns: 1fr;
   }
 }
+
 /* ==========================================
    DEVAN PLACEMENTS - SHARE JOB BUTTONS
    ========================================== */
