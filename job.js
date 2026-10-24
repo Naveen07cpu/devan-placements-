@@ -193,7 +193,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     "#job-contact",
     contact
   );
+/* ---------- SHARE CURRENT JOB ---------- */
 
+const shareCurrentButton = document.getElementById(
+  "share-current-job"
+);
+
+const copyCurrentButton = document.getElementById(
+  "copy-current-job"
+);
+
+if (shareCurrentButton) {
+  shareCurrentButton.addEventListener("click", () => {
+    shareJob(job.code, job.title, job.country);
+  });
+}
+
+if (copyCurrentButton) {
+  copyCurrentButton.addEventListener("click", () => {
+    copyJobLink(job.code);
+  });
+}
   /* ---------- WHATSAPP ENQUIRY ---------- */
 
   $("#wa-enquiry").href = waLink(
