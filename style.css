@@ -631,3 +631,20 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
     width: 100%;
   }
 }
+
+/* Footer social icon buttons */
+.social-list .social-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+.social-list .social-icon img {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);   /* white icons. Use "none" if your icons are already colored */
+}
+.social-list .social-icon:hover {
+  background: rgba(255,255,255,.15);
+}
