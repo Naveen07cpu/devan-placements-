@@ -11,16 +11,16 @@ const SITE = {
   phone: "+91 86810 22518",
   whatsappNumber: "918681022518",          // digits only, with country code
   email: "devanplacements@gmail.com",
-  address: "No: 6 1st Floor Eswaran Koil St, Koyambedu landmark: Koyambedu Post Office CH- 600107 Tamil Nadu",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
-  hours: "9:00 AM -7:00PM ",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "https://maps.app.goo.gl/nAKrBiLzSoCuwda36",                              // Google Maps share link of the office
+  address: "",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
+  hours: "",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
+  mapsUrl: "",                              // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
-  domain: "https://www.devanplacement.in/",// change when the real domain is live
+  domain: "https://www.devanplacements.com",// change when the real domain is live
   social: {
-    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
-    Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
+    Instagram: "https://instagram.com/devanplacements",
+    Facebook: "",
     WhatsApp: "",                           // filled automatically from whatsappNumber
-    Telegram: "https://t.me/Devanplacements",
+    Telegram: "",
     LinkedIn: "",
     YouTube: "",
   },
@@ -79,11 +79,11 @@ function renderChrome() {
   const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
   if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
   // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "maps" };
   const socialHtml = Object.entries(social)
     .filter(([, url]) => url)
     .map(([name, url]) => `<li><a class="social-icon" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(name)} (opens in a new tab)">` +
-      `<img src="images/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
+      `<img src="images/icons/${ICONS[name] || "link"}.svg" alt="" width="22" height="22" onerror="this.replaceWith(document.createTextNode('${esc(name)}'))" /></a></li>`)
     .join("");
 
   const header = $("#site-header");
@@ -92,7 +92,7 @@ function renderChrome() {
       <a class="skip-link" href="#main">Skip to main content</a>
       <header class="site-header">
         <div class="container header-inner">
-          <a href="${home || "#home"}" class="brand"> <img src="images/devan%20placement%20logos.svg" alt="Devan Placements Logo"></a>
+          <a href="${home || "#home"}" class="brand">Devan <span>Placements</span></a>
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu"><span aria-hidden="true">☰</span></button>
           <nav class="nav-menu" id="nav-menu" aria-label="Main">
             <a href="${home}#about">About</a>
@@ -193,6 +193,9 @@ function injectStructuredData() {
 }
 
 /* ---------- clean up what comes from the sheet ---------- */
+// only https addresses are ever used as an image source
+function safeImageUrl(u) { return /^https:\/\/\S+$/i.test(String(u || "").trim()) ? String(u).trim() : ""; }
+
 function normalizeJob(j) {
   const o = {};
   Object.keys(j).forEach((k) => {
@@ -205,6 +208,7 @@ function normalizeJob(j) {
   o.country = known === "UAE" ? "United Arab Emirates" : (known || c.replace(/\b\w/g, (m) => m.toUpperCase()));
   const cat = CATEGORY_LIST.find((x) => x.toLowerCase() === String(o.category || "").trim().toLowerCase());
   if (cat) o.category = cat;
+  o.image = safeImageUrl(o.image);
   return o;
 }
 
@@ -242,6 +246,7 @@ function jobCardHTML(j) {
   return `
     <article class="card job">
       <div>
+        ${safeImageUrl(j.image) ? `<a class="job-poster" href="${url}" tabindex="-1" aria-hidden="true"><img src="${esc(safeImageUrl(j.image))}" alt="" loading="lazy" /></a>` : ""}
         <div class="job-top"><span class="code">CODE: ${esc(j.code)}</span><span class="loc">${esc(j.country)} ${flagOf(j.country)}</span></div>
         <h3><a href="${url}">${esc(j.title)}</a></h3>
         <p class="desc">${esc(j.description || j.role || "")}</p>
