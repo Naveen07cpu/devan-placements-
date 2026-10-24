@@ -670,3 +670,6 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 /* hover and keyboard focus */
 .site-footer .social-list a:hover { background: rgba(255,255,255,.15); border-color: var(--gold); text-decoration: none; }
 .social-list a:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+   /* Follow us icons are drawn in site.js: white, 24px */
+   .social-list .social-icon { color: #fff; }
+   .social-list .social-icon svg { width: 24px; height: 24px; display: block; }
