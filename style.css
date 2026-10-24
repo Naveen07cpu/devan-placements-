@@ -45,7 +45,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .site-header { position: sticky; top: 0; z-index: 50; background: var(--navy-900); border-bottom: 1px solid var(--slate-800); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .brand { font-family: var(--font-head); font-weight: 700; font-size: 20px; color: #fff; }
-.brand img { width: 75px; height: auto; display: block; object-fit: contain; }
 .brand span { color: var(--gold); }
 .nav-menu { display: flex; align-items: center; gap: 24px; font-size: 14px; font-weight: 500; color: var(--slate-300); }
 .nav-menu a:hover { color: #fff; }
@@ -459,3 +458,16 @@ input.invalid, select.invalid, textarea.invalid { border-color: #dc2626; }
 .social-list .social-icon { padding: 0 11px; border-radius: 999px; }   /* round with an icon, a pill if the icon file is missing and the name shows */
 .social-list .social-icon img { width: 22px; height: 22px; filter: invert(1); }   /* black icon files become white */
 .social-list a:hover { background: rgba(255,255,255,.12); text-decoration: none; }
+
+/* poster images */
+.job-poster { display: block; margin: -4px -4px 14px; border-radius: 12px; overflow: hidden; background: var(--slate-100); }
+.job-poster img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+#sec-poster a { display: block; }
+#job-poster { display: block; width: 100%; max-height: 640px; object-fit: contain; border: 1px solid var(--slate-200); border-radius: 14px; background: var(--slate-50); }
+.poster-field { margin: 4px 0 20px; }
+.poster-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+#poster-preview { width: 120px; height: 150px; object-fit: cover; border-radius: 10px; border: 1px solid var(--slate-300); background: var(--slate-100); }
+.poster-btn { padding: 12px 18px; font-size: 14px; cursor: pointer; }
+.poster-btn:focus-within { outline: 3px solid var(--navy-600); outline-offset: 2px; }
+.poster-msg { margin: 8px 0 0; font-size: 13px; color: var(--slate-600); }
+.data-table .thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; vertical-align: middle; margin-right: 10px; border: 1px solid var(--slate-200); }
