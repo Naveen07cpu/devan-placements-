@@ -6,6 +6,7 @@ let JOBS = [];
 let SUBS = { headers: [], rows: [], total: 0, type: "application" };
 
 const FIELDS = [
+  ["code", "Job code (leave empty to create it automatically)", "text", false, { ph: "e.g. JOB-010 or DP-QA-001" }],
   ["title", "Job title", "text", true],
   ["country", "Country", "text", true, { list: "country-list" }],
   ["category", "Category", "select", false, { options: CATEGORY_LIST, blank: "Choose category" }],
@@ -170,7 +171,7 @@ async function saveJob(e) {
   if (!validateForm(form)) return showStatus($("#job-status"), "Please fill the highlighted fields.", "err");
   const job = Object.fromEntries(FIELDS.map(([k]) => [k, $("#f-" + k).value.trim()]));
   const original = editingCode ? JOBS.find((j) => j.code === editingCode) : null;
-  if (original) { job.code = original.code; job.postedDate = original.postedDate; }
+  if (original) { job.code = job.code || original.code; job.postedDate = original.postedDate; }   // a changed code renames the job
   const btn = $("#job-save");
   btn.disabled = true; btn.textContent = "Saving...";
   try {
