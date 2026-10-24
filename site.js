@@ -3,6 +3,7 @@
    EDIT THE SETTINGS BELOW. Empty values are simply hidden on the site.
    ========================================================== */
 
+/* ---------- 1. SETTINGS ---------- */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMz6CfIquzkq3l9JwbIzjEJV-y_vSKlh5diG4T4f-TMQfqD6mSCQcB2zMEAH1dD0pU/exec";
 
 const SITE = {
@@ -11,13 +12,13 @@ const SITE = {
   phone: "+91 86810 22518",
   whatsappNumber: "918681022518",          // digits only, with country code
   email: "devanplacements@gmail.com",
-  address: "no:6 1st floor eswaran koil st, koyambedu, landmark : koyambedu post office ",                              // e.g. "12, Anna Salai, Chennai, Tamil Nadu 600002, India"
-  hours: "9:00 AM to 7:00 PM",                                // e.g. "Mon - Sat, 9:30 AM - 6:30 PM"
-  mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",                              // Google Maps share link of the office
+  address: "No: 6, 1st Floor, Eswaran Koil St, Koyambedu, Landmark: Koyambedu Post Office",
+  hours: "9:00 AM to 7:00 PM",
+  mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",   // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
   domain: "https://www.devanplacements.in",// change when the real domain is live
   social: {
-    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu"",
+    Instagram: "https://www.instagram.com/devanplacements007?vrfl=aThzcTRjeG5ubTdu",
     Facebook: "https://www.facebook.com/profile.php?id=100094139439605&mibextid=ZbWKwL",
     WhatsApp: "",                           // filled automatically from whatsappNumber
     Telegram: "https://t.me/Devanplacements",
@@ -29,6 +30,7 @@ const SITE = {
   sampleJobsOnError: true,
 };
 
+/* ---------- 2. LISTS ---------- */
 const COUNTRY_FLAGS = {
   "Singapore": "🇸🇬", "Malaysia": "🇲🇾", "United Arab Emirates": "🇦🇪", "UAE": "🇦🇪", "Saudi Arabia": "🇸🇦",
   "Qatar": "🇶🇦", "Kuwait": "🇰🇼", "Oman": "🇴🇲", "Bahrain": "🇧🇭", "Ireland": "🇮🇪",
@@ -65,7 +67,7 @@ const SAMPLE_JOBS = [
     description: "Reputed international dining group in Kuala Lumpur hiring experienced supervisors to oversee culinary prep." },
 ];
 
-/* ---------- tiny helpers ---------- */
+/* ---------- 3. TINY HELPERS ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -73,29 +75,36 @@ const waLink = (msg) => `https://wa.me/${SITE.whatsappNumber}` + (msg ? `?text=$
 const flagOf = (country) => COUNTRY_FLAGS[country] || "🌐";
 const isHome = () => /(^|\/)(index\.html)?$/.test(location.pathname);
 
-/* ---------- header / footer / floating WhatsApp ---------- */
+/* ---------- 4. HEADER / FOOTER / FLOATING WHATSAPP ---------- */
 function renderChrome() {
   const home = isHome() ? "" : "index.html";
-  const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
-  if (SITE.mapsUrl) social["googlemaps"] = SITE.mapsUrl;
-  // Icon file for each link: images/icons/<name>.svg (or .png). If the file is missing, the text name is shown instead.
-  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "googlemaps": "googlemaps" };
-  const socialHtml = Object.entries(SITE.social || {})
-  .filter(([name, url]) => typeof url === "string" && url.trim() !== "")
-  .map(([name, url]) => {
-    const safeUrl = esc(url);
-    const safeName = esc(name);
-    return `<li><a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeName}</a></li>`;
-  })
-  .join("");
 
+  // social links: WhatsApp is filled from the number, Google Maps from mapsUrl
+  const social = { ...SITE.social, WhatsApp: SITE.social.WhatsApp || waLink() };
+  if (SITE.mapsUrl) social["Google Maps"] = SITE.mapsUrl;
+
+  // Icon file for each link: images/icons/<name>.svg. If the file is missing, the text name is shown instead.
+  const ICONS = { Instagram: "instagram", Facebook: "facebook", WhatsApp: "whatsapp", Telegram: "telegram", LinkedIn: "linkedin", YouTube: "youtube", "Google Maps": "googlemaps" };
+
+  const socialHtml = Object.entries(social)
+    .filter(([, url]) => typeof url === "string" && url.trim() !== "")
+    .map(([name, url]) => {
+      const icon = ICONS[name];
+      const inner = icon
+        ? `<img src="images/icons/${icon}.svg" alt="" onerror="this.replaceWith(document.createTextNode(this.dataset.name))" data-name="${esc(name)}" /><span class="sr-only">${esc(name)}</span>`
+        : esc(name);
+      return `<li><a${icon ? ' class="social-icon"' : ""} href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(name)}">${inner}</a></li>`;
+    })
+    .join("");
+
+  /* header */
   const header = $("#site-header");
   if (header) {
     header.innerHTML = `
       <a class="skip-link" href="#main">Skip to main content</a>
       <header class="site-header">
         <div class="container header-inner">
-         <a href="${home || '#home'}" class="brand"> <img src="images/devan placement logos.svg" alt="Devan Placements Logos" class="brand-logo"> <span class="brand-text"> Devan <span>Placements</span> </span></a>
+          <a href="${home || "#home"}" class="brand"><img src="images/devan%20placement%20logos.svg" alt="Devan Placements logo" class="brand-logo" onerror="this.style.display='none'"><span class="brand-text">Devan <span>Placements</span></span></a>
           <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu"><span aria-hidden="true">☰</span></button>
           <nav class="nav-menu" id="nav-menu" aria-label="Main">
             <a href="${home}#about">About</a>
@@ -121,6 +130,7 @@ function renderChrome() {
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("open")) { setOpen(false); toggle.focus(); } });
   }
 
+  /* footer */
   const footer = $("#site-footer");
   if (footer) {
     footer.innerHTML = `
@@ -177,7 +187,7 @@ function renderChrome() {
   });
 }
 
-/* ---------- search-engine data (JSON-LD) ---------- */
+/* ---------- 5. SEARCH-ENGINE DATA (JSON-LD) ---------- */
 function injectStructuredData() {
   if (document.body.hasAttribute("data-noindex")) return;   // admin page: keep out of search results
   const sameAs = Object.values(SITE.social).filter(Boolean);
@@ -195,7 +205,7 @@ function injectStructuredData() {
   document.head.appendChild(s);
 }
 
-/* ---------- clean up what comes from the sheet ---------- */
+/* ---------- 6. CLEAN UP WHAT COMES FROM THE SHEET ---------- */
 // only https addresses are ever used as an image source
 function safeImageUrl(u) { return /^https:\/\/\S+$/i.test(String(u || "").trim()) ? String(u).trim() : ""; }
 
@@ -215,7 +225,7 @@ function normalizeJob(j) {
   return o;
 }
 
-/* ---------- jobs from Google Sheet ---------- */
+/* ---------- 7. JOBS FROM GOOGLE SHEET ---------- */
 async function loadJobs() {
   const key = "dp_jobs_v2";
   try {
@@ -263,27 +273,18 @@ function jobCardHTML(j) {
         <a class="apply" href="${url}#apply">Apply Now<span class="sr-only"> for ${esc(j.title)}</span></a>
         <a class="details" href="${url}">View Details<span class="sr-only"> of ${esc(j.title)}</span></a>
       </div>
+      <div class="job-share-actions job-card-share">
+        <button type="button" class="btn btn-outline btn-sm job-share-btn"
+          data-share-job="${esc(j.code)}" data-title="${esc(j.title)}" data-country="${esc(j.country)}"
+          aria-label="Share ${esc(j.title)} vacancy">↗ Share Job</button>
+        <button type="button" class="btn btn-outline btn-sm job-copy-btn"
+          data-copy-job="${esc(j.code)}"
+          aria-label="Copy link to ${esc(j.title)} vacancy">🔗 Copy Link</button>
+      </div>
     </article>`;
 }
-<button
-  type="button"
-  class="btn btn-outline job-share-btn"
-  data-share-job="${esc(j.code)}"
-  data-title="${esc(j.title)}"
-  data-country="${esc(j.country)}"
-  aria-label="Share ${esc(j.title)} vacancy"
->
-  ↗ Share Job
-</button>
 
-<button
-  type="button"
-  class="btn btn-outline job-copy-btn"
-  data-copy-job="${esc(j.code)}"
->
-  🔗 Copy Link
-</button>
-/* ---------- forms ---------- */
+/* ---------- 8. FORMS ---------- */
 const MAX_FILE_MB = 5;
 const ALLOWED_EXT = ["pdf", "doc", "docx"];
 
@@ -398,14 +399,7 @@ function bindForm(selector, formType, { successMsg, extra, needsResume } = {}) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderChrome();
-  injectStructuredData();
-});
-/* ==========================================
-   DEVAN PLACEMENTS - JOB SHARING
-   ========================================== */
-
+/* ---------- 9. JOB SHARING ---------- */
 function getJobShareUrl(code) {
   const url = new URL("job.html", window.location.href);
   url.search = "";
@@ -421,11 +415,7 @@ async function shareJob(code, title, country) {
   // Use the phone's native share menu when supported
   if (navigator.share) {
     try {
-      await navigator.share({
-        title: `${title} | Devan Placements`,
-        text,
-        url
-      });
+      await navigator.share({ title: `${title} | Devan Placements`, text, url });
       return;
     } catch (error) {
       if (error.name === "AbortError") return;
@@ -434,17 +424,11 @@ async function shareJob(code, title, country) {
 
   // Otherwise, share through WhatsApp
   const message = `${text}\n\nApply here:\n${url}`;
-
-  window.open(
-    `https://wa.me/?text=${encodeURIComponent(message)}`,
-    "_blank",
-    "noopener,noreferrer"
-  );
+  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
 }
 
 async function copyJobLink(code) {
   const url = getJobShareUrl(code);
-
   try {
     await navigator.clipboard.writeText(url);
     alert("Job link copied successfully!");
@@ -453,23 +437,23 @@ async function copyJobLink(code) {
   }
 }
 
-/* Event handling for dynamically created job cards */
+/* Click handling for the share / copy buttons on job cards */
 document.addEventListener("click", (event) => {
   const shareButton = event.target.closest("[data-share-job]");
   const copyButton = event.target.closest("[data-copy-job]");
 
   if (shareButton) {
     event.preventDefault();
-
-    shareJob(
-      shareButton.dataset.shareJob,
-      shareButton.dataset.title || "Job Vacancy",
-      shareButton.dataset.country || ""
-    );
+    shareJob(shareButton.dataset.shareJob, shareButton.dataset.title || "Job Vacancy", shareButton.dataset.country || "");
   }
-
   if (copyButton) {
     event.preventDefault();
     copyJobLink(copyButton.dataset.copyJob);
   }
+});
+
+/* ---------- 10. START ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  renderChrome();
+  injectStructuredData();
 });
