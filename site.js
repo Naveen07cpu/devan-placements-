@@ -16,7 +16,7 @@ const SITE = {
   hours: "9:00 AM to 7:00 PM",
   mapsUrl: "https://maps.app.goo.gl/nekgwBp4pyBFWgqz5",   // Google Maps share link of the office
   registrationNo: "",                       // recruitment agency licence / registration number, if any
-  domain: "https://www.devanplacements.in",// change when the real domain is live
+  domain: "https://www.devanplacement.in",// change when the real domain is live
   iconFolder: "images/",                    // folder that holds your social icons, e.g. images/instagram.svg (svg, png, webp, jpg are all tried)
   iconFiles: {                              // only fill this if an icon has a different file name, e.g. Instagram: "images/icons/insta.png"
     Instagram: "", Facebook: "", WhatsApp: "", Telegram: "", LinkedIn: "", YouTube: "", "Google Maps": "",
