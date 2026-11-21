@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.devanplacements.com/sitemap.xml
+Sitemap: https://www.devanplacement.in/sitemap.xml
